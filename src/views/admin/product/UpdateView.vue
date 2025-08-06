@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, onMounted, ref } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute, RouterLink } from 'vue-router';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 
 import { useAdminProductStore } from '@/stores/admin/product';
@@ -10,20 +10,7 @@ const router = useRouter()
 const route = useRoute()
 
 const productIndex = ref(-1)
-const pass = ref('')
-
-// const productIndex = ref(-1)
-// const mode = ref('ADD')
-
-// onMounted(() => {
-//     if (route.params.id) {
-//         productIndex.value = parseInt(route.params.id)
-//         mode.value = 'EDIT'
-
-//         const selectedProduct = adminProductStore.getProduct(productIndex.value)
-//         console.log('selectedProduct', selectedProduct)
-//     }
-// })
+const mode = ref('ADD')
 
 const productData = reactive({
     name: '',
@@ -57,13 +44,28 @@ const formData = [
     }
 ]
 
-const addProduct = () => {
-    adminProductStore.addProduct(productData)
+const updateProduct = () => {
+    if (mode.value == 'EDIT') {
+        adminProductStore.updateProduct(productIndex.value, productData)
+    }else{
+        adminProductStore.addProduct(productData)
+    }
     router.push({ name: 'admin-products' })
 }
 
 onMounted(() => {
     if (route.params.id) {
+        productIndex.value = parseInt(route.params.id)
+        mode.value = 'EDIT'
+
+        const selectedProduct = adminProductStore.getProduct(productIndex.value)
+        
+        productData.name = selectedProduct.name
+        productData.image = selectedProduct.image
+        productData.price = selectedProduct.price
+        productData.quantity = selectedProduct.quantity
+        productData.about = selectedProduct.about
+        productData.status = selectedProduct.status
         
     }
 })
@@ -73,7 +75,7 @@ onMounted(() => {
 <template>
     <AdminLayout>
         <div class="shadow-xl p-8 mt-2">
-            <div class="text-xl font-bold">Add</div>
+            <div class="text-xl font-bold">{{ mode }}</div>
             <div class="divider"></div>
             <div class="grid grid-cols-2 gap-2">
                 <div v-for="form in formData">
@@ -99,8 +101,8 @@ onMounted(() => {
                 </fieldset>
             </div>
             <div class="mt-4 flex justify-end">
-                <button class="btn btn-ghost">Back</button>
-                <button class="btn btn-neutral" @click="addProduct()">Add</button>
+                <RouterLink :to="{ name: 'admin-products' }" class="btn btn-ghost">Back</RouterLink>
+                <button class="btn btn-neutral" @click="updateProduct()">{{ mode }}</button>
             </div>
 
 
