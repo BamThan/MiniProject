@@ -52,8 +52,7 @@ onMounted(() => {
                         :to="{name: menu.routeName}"
                         :class="menu.routeName === activeMenu ? 'menu-active' : ''">
                         {{ menu.name }}
-                    </RouterLink>
-                    
+                    </RouterLink> 
                 </li>
             </ul>
         </div>
